@@ -1,0 +1,120 @@
+### Decision_Trees Full Code with Graphs ###
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score, classification_report
+
+df = pd.read_csv("iphone_purchase_records.csv")
+label_encoder = LabelEncoder()
+df['Gender'] = label_encoder.fit_transform(df['Gender'])
+
+X = df[['Age', 'Salary', 'Gender']]
+y = df['Purchase Iphone']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+plt.figure(figsize=(12,8))
+plot_tree(model, feature_names=['Age', 'Salary', 'Gender'], class_names=['No', 'Yes'], filled=True)
+plt.title("Decision Tree")
+plt.show()
+
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+### KNN_Regression Full Code with Graphs ###
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report, accuracy_score
+
+iris = sns.load_dataset('iris')
+X = iris.drop(columns=['species'])
+y = iris['species']
+
+sns.boxplot(x='species', y='sepal_length', data=iris)
+plt.title("Boxplot of Sepal Length by Species")
+plt.show()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+
+### Lasso_and_Ridge Full Code with Graphs ###
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
+
+df = pd.read_csv('Assignment 2 Advertising (1).csv')
+X = df[['TV', 'Radio', 'Newspaper']]
+y = df[['Sales']]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+alpha_values = {'alpha': np.logspace(-3, 3, 10)}
+ridge = Ridge()
+ridge_cv = GridSearchCV(ridge, alpha_values, cv=5, scoring='neg_mean_squared_error')
+ridge_cv.fit(X_train, y_train)
+
+best_ridge = ridge_cv.best_estimator_
+y_pred = best_ridge.predict(X_test)
+
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Sales")
+plt.ylabel("Predicted Sales")
+plt.title("Ridge Regression Prediction vs Actual")
+plt.show()
+
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+print("Best Alpha:", ridge_cv.best_params_)
+print("RMSE:", rmse)
+
+### Polynomial_Regression Full Code with Graphs ###
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+df = pd.read_csv("https://raw.githubusercontent.com/content-anu/dataset-polynomial-regression/master/Position_Salaries.csv")
+X = df[['Level']]
+y = df[['Salary']]
+
+poly = PolynomialFeatures(degree=3)
+X_poly = poly.fit_transform(X)
+
+model = LinearRegression()
+model.fit(X_poly, y)
+y_pred = model.predict(X_poly)
+
+plt.scatter(X, y, color='red')
+plt.plot(X, y_pred, color='blue')
+plt.title("Polynomial Regression Fit")
+plt.xlabel("Position Level")
+plt.ylabel("Salary")
+plt.show()
+
+print("R2 Score:", r2_score(y, y_pred))
+print("MSE:", mean_squared_error(y, y_pred))
+
